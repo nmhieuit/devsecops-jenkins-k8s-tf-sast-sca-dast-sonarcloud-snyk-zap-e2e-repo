@@ -1,0 +1,26 @@
+pipeline {
+  agent any
+  tools { 
+        maven 'Maven_3_5_2'  
+    }
+   stages{
+     stage('Build') { 
+      steps { 
+         withDockerRegistry([credentialsId: "dockerlogin", url: ""]) {
+           script{
+           app =  docker.build("asg")
+           }
+         }
+      }
+     }
+     stage('Push') {
+       steps {
+          script{
+              docker.withRegistry('https://501856150866.dkr.ecr.ap-southeast-2.amazonaws.com', 'ecr:ap-southeast-2:aws-credentials') {
+              app.push("latest")
+              }
+          }
+        }
+    	}
+	   } 
+  }
